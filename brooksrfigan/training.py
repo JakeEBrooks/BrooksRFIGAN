@@ -1,4 +1,6 @@
+import os
 import time
+import datetime
 import logging
 log = logging.getLogger(__name__)
 
@@ -68,7 +70,7 @@ def validate_step(im_batch, mask_batch, generator, discriminator):
     val_disc_metric.update_state(tf.zeros_like(disc_fake_out), disc_fake_out) # How good the discriminator is at spotting fakes
 
 
-def train(dataset, epochs=10, validation_multi=1, batch_size=32, gen_loss_lambda=100, generator_model=None, discriminator_model=None): #remember to add "dataset" argument
+def train(dataset, epochs=10, validation_multi=1, batch_size=32, gen_loss_lambda=100, generator_model=None, discriminator_model=None, tblogdir=os.getcwd()+'/tensorboard_log/'):
     if generator_model != None and isinstance(generator_model, tf.keras.Model):
         generator = generator_model
     else:
@@ -78,7 +80,16 @@ def train(dataset, epochs=10, validation_multi=1, batch_size=32, gen_loss_lambda
     else:
         discriminator = disc.ConvNet_default((128,1024,1))
 
+    tstart = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    summary_writer = tf.summary.create_file_writer(tblogdir+tstart)
+
+
     log.info('-- Splitting data into training and validation sets...')
+
+    tbsamples = dataset.take(3).batch(3)
+    for x, y in tbsamples: #this is so dumb, do better tensorflow
+        tbimages = x
+        tbmasks = y
     val_ds = dataset.take(int(batch_size*validation_multi))
     train_ds = dataset.skip(int(batch_size*validation_multi))
     val_ds = val_ds.shuffle(10, reshuffle_each_iteration=False).batch(batch_size)
@@ -89,6 +100,7 @@ def train(dataset, epochs=10, validation_multi=1, batch_size=32, gen_loss_lambda
         epoch_startime = time.time()
         log.info('')
         log.info('---- Starting training epoch {}/{}'.format(epoch+1, epochs))
+
         for step, (im_batch, mask_batch) in enumerate(train_ds):
             train_step(im_batch, mask_batch, generator, discriminator, gen_loss_lambda)
             log.info('Iterations - {}   Generated image accuracy - {:.4f}   Generator performance - {:.4f}   Discriminator performance - {:.4f}'.format(step, train_img_metric.result(), train_gen_metric.result(), train_disc_metric.result()))
@@ -103,6 +115,10 @@ def train(dataset, epochs=10, validation_multi=1, batch_size=32, gen_loss_lambda
         val_img_metric.reset_state()
         val_gen_metric.reset_state()
         val_disc_metric.reset_state()
+
+        with summary_writer.as_default():
+            tf.summary.image("Generator guesses", generator(tbimages, training=False), max_outputs=3, step=epoch)
+
         log.info('-- Time taken for this epoch: {}'.format(s_to_hms(time.time() - epoch_startime)))
         if epoch < (epochs - 1):
             log.info('-- ETA: {}'.format(s_to_hms((time.time() - epoch_startime)*((epochs - 1) - epoch))))

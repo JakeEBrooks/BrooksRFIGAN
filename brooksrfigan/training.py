@@ -7,8 +7,8 @@ log = logging.getLogger(__name__)
 import numpy as np
 import tensorflow as tf
 
-import brooksrfigan.discriminator as disc
-import brooksrfigan.generator as gen
+import brooksrfigan.generator
+import brooksrfigan.discriminator
 
 bce_loss = tf.keras.losses.BinaryCrossentropy()
 mae_loss = tf.keras.losses.MeanAbsoluteError()
@@ -25,6 +25,7 @@ generator_optimizer = tf.keras.optimizers.Adam()
 discriminator_optimizer = tf.keras.optimizers.Adam()
 
 def s_to_hms(total_seconds):
+    """Convenience function to get N seconds in HMS format"""
     hours = total_seconds // 3600
     minutes = (total_seconds - hours*3600) // 60
     seconds = (total_seconds - hours*3600 - minutes*60)
@@ -74,11 +75,11 @@ def train(dataset, epochs=10, validation_multi=1, batch_size=32, gen_loss_lambda
     if generator_model != None and isinstance(generator_model, tf.keras.Model):
         generator = generator_model
     else:
-        generator = gen.Unet_default((128,1024,1))
+        generator = brooksrfigan.generator.Unet_default((128,1024,1))
     if discriminator_model != None and isinstance(discriminator_model, tf.keras.Model):
         discriminator = discriminator_model
     else:
-        discriminator = disc.ConvNet_default((128,1024,1))
+        discriminator = brooksrfigan.discriminator.ConvNet_default((128,1024,1))
 
     if enable_tensorboard:
         tbsamples = dataset.take(3).batch(3)
@@ -110,7 +111,7 @@ def train(dataset, epochs=10, validation_multi=1, batch_size=32, gen_loss_lambda
             log.info('Iterations - {}   Generated image accuracy - {:.4f}   Generator performance - {:.4f}   Discriminator performance - {:.4f}'.format(step, train_img_metric.result(), train_gen_metric.result(), train_disc_metric.result()))
         if enable_tensorboard:
             with train_writer.as_default(step=epoch):
-                tf.summary.scalar('Image Accuracy',train_img_metric.result())
+                tf.summary.scalar('Image MAE',train_img_metric.result())
                 tf.summary.scalar('Generator Performace',train_gen_metric.result())
                 tf.summary.scalar('Discriminator Performance',train_disc_metric.result())
         train_img_metric.reset_state()
@@ -123,15 +124,16 @@ def train(dataset, epochs=10, validation_multi=1, batch_size=32, gen_loss_lambda
         log.info('Validation metrics:  Generated image accuracy - {:.4f}   Generator performance - {:.4f}   Discriminator performance - {:.4f}'.format(val_img_metric.result(), val_gen_metric.result(), val_disc_metric.result()))
         if enable_tensorboard:
             with val_writer.as_default(step=epoch):
-                tf.summary.scalar('Image Accuracy',val_img_metric.result())
+                tf.summary.scalar('Image MAE',val_img_metric.result())
                 tf.summary.scalar('Generator Performace',val_gen_metric.result())
                 tf.summary.scalar('Discriminator Performance',val_disc_metric.result())
         val_img_metric.reset_state()
         val_gen_metric.reset_state()
         val_disc_metric.reset_state()
 
-        with img_writer.as_default():
-            tf.summary.image("Generator guesses", generator(tbimages, training=False), max_outputs=3, step=epoch)
+        if enable_tensorboard:
+            with img_writer.as_default():
+                tf.summary.image("Generator guesses", generator(tbimages, training=False), max_outputs=3, step=epoch)
 
         log.info('-- Time taken for this epoch: {}'.format(s_to_hms(time.time() - epoch_startime)))
         if epoch < (epochs - 1):

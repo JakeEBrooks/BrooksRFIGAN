@@ -31,6 +31,7 @@ class MSHandler():
         for w in self.spws:
             self.chanfreqs = np.append(self.chanfreqs,msmd.chanfreqs(w))
             self.chanwidths = np.append(self.chanwidths,msmd.chanwidths(w))
+        self.chans_per_spw = len(self.chanfreqs)//len(self.spws)
         self.fieldnames = msmd.fieldnames()
         self.fieldids = msmd.fieldsforname()
         msmd.done()
@@ -118,6 +119,22 @@ class MSHandler():
         scans = self.mstool.getdata(['scan_number'])['scan_number']
         self.mstool.done()
         return scans
+    
+    def getPrisonBars(self, quack_cols: int, major_chan_rowflags: int, minor_chan_rowflags: int, fields=None):
+        channels = np.arange(len(self.chanfreqs))
+        col_flags = np.array([])
+        row_flags = np.array([])
+        scans = self.getScans(fields)
+        for col in np.arange(0,len(scans)):
+            if scans[col-1] != scans[col]:
+                col_flags = np.append(col_flags,np.arange(quack_cols)+col)
+        row_flags = np.append(row_flags,channels[:major_chan_rowflags])
+        row_flags = np.append(row_flags,channels[- major_chan_rowflags:])
+        for n in np.arange(1,len(self.spws)):
+            row_flags = np.append(row_flags,np.arange(n*self.chans_per_spw - minor_chan_rowflags, n*self.chans_per_spw + minor_chan_rowflags))
+        row_flags.sort()
+        col_flags.sort()
+        return row_flags.astype(int), col_flags.astype(int) 
 
     def done(self):
         self.mstool.done()
@@ -157,7 +174,7 @@ def normalize(x, high=1, low=0):
     else:
         raise RuntimeError('Input to normalise has size <= 1, I can\'t normalise this!')
 
-def pad_for_cutouts(images, cutout_size=(128,1024), pad_mode='minimum'):
+def pad_for_cutouts(images, cutout_size=(128,1024), **padkwargs):
     assert images.ndim == 3
     time_padded_size = 0
     while time_padded_size < images.shape[1]:
@@ -169,8 +186,9 @@ def pad_for_cutouts(images, cutout_size=(128,1024), pad_mode='minimum'):
     time_pads = time_padded_size - images.shape[1]
     freq_pads = freq_padded_size - images.shape[2]
     pads = np.array([[time_pads//2, time_pads - time_pads//2],[freq_pads//2, freq_pads - freq_pads//2]])
+    log.info('Padded {} to time axis, {} to frequency axis'.format(pads[0,:], pads[1,:]))
 
-    return np.pad(images,((0,0),(pads[0,0],pads[0,1]),(pads[1,0],pads[1,1])),mode=pad_mode)
+    return np.pad(images,((0,0),(pads[0,0],pads[0,1]),(pads[1,0],pads[1,1])), **padkwargs)
 
 def make_cutouts(images, cutout_size=(128,1024)):
     assert images.ndim == 3
@@ -180,4 +198,5 @@ def make_cutouts(images, cutout_size=(128,1024)):
     for im in np.arange(images.shape[0]):
         cuts = np.array(np.split(images[im,:,:], images.shape[1]//cutout_size[0]))
         cutouts = np.append(cutouts,cuts,axis=0)
+    log.info('Produced {} cutouts from {} input images'.format(cutouts.shape[0], images.shape[0]))
     return cutouts

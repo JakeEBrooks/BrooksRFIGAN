@@ -1,16 +1,17 @@
 [project]
 name = "brooksrfigan"
-version = "0.0.1"
-requires-python = ">=3.0.0, <=3.10.0" # Ensure python 3, CASA doesn't work on the latest python
+version = "0.1"
+requires-python = ">=3.0.0 # Ensure python 3
 dependencies = [
     "numpy",
     "scipy",
     "tensorflow",
+    "keras-tuner",
     "casatools",
     "casadata"
 ]
 description = "A library to enable quick interface between the CASA Measurement Set format and Tensorflow for training a GAN"
-readme = "README.md"
+readme = "README.rst"
 license = {file = "LICENSE.md"}
 authors = [{name = "Jacob Brooks", email = "jebrooks@uclan.ac.uk"}]
 

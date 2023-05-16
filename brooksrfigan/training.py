@@ -7,8 +7,8 @@ log = logging.getLogger(__name__)
 import numpy as np
 import tensorflow as tf
 
-import brooksrfigan.generator
-import brooksrfigan.discriminator
+from brooksrfigan.generator import Unet_default
+from brooksrfigan.discriminator import ConvNet_default
 
 bce_loss = tf.keras.losses.BinaryCrossentropy()
 mae_loss = tf.keras.losses.MeanAbsoluteError()
@@ -71,7 +71,29 @@ def validate_step(im_batch, mask_batch, generator, discriminator):
     val_disc_metric.update_state(tf.zeros_like(disc_fake_out), disc_fake_out) # How good the discriminator is at spotting fakes
 
 
-def train(dataset, epochs=10, validation_multi=1, batch_size=32, gen_loss_lambda=100, generator_model=None, discriminator_model=None, tblogdir=os.getcwd()+'/tensorboard_log/',enable_tensorboard=False):
+def train(dataset, epochs=10, batch_size=32, validation_multi=1, gen_loss_lambda=100, generator_model=None, discriminator_model=None, tblogdir='./tensorboard_log/',enable_tensorboard=False):
+    """
+    The primary function of this package. Interfaces with Tensorflow to produce a trained generator model and discriminator model. The trained generator model can be used generate accurate flag masks that
+    retain the characteristics of those found in the training set. By default, the function will train a generator and a discriminator using the basic models found in brooksrfigan.generator and brooksrfigan.dsicriminator,
+    though an option exists to specify a different Keras model. Details of the training process can be logged to tensorboard through the *enable_tensorboard* parameter, and the location of the stored information is 
+    controlled by passing a filepath to *tblogdir*. Also outputs useful information to the python logger during training.
+
+    .. role:: python(code)
+        :language: python
+
+    :param dataset: A two component `tf.data.Dataset <https://www.tensorflow.org/api_docs/python/tf/data/Dataset>`_ instance containing the image and ground truth mask cutouts. Normally created by something like:
+        :python:`dataset = tf.data.Dataset.from_tensor_slices((images,masks))` where *images* and *masks* are numpy arrays created by preprocessing.make_cutouts, for example.
+    :param epochs: An integer specifying the number of loops to perform over the full training set. A validation run is performed at the end of each epoch.
+    :param batch_size: How many images to process in each training step. The choice of batch_size is pretty much down to how much memory you have on your system. Higher RAM capacity systems can process more batches at once.
+    :param validation_multi: How many multiples of *batch_size* to set aside as a validation set. For example, with a batch size of 16, setting *validation_multi = 4* would keep aside 64 images for validation at
+        the end of each epoch
+    :param gen_loss_lambda: An integer specifying the weight associated with the mean absolute error in the generator loss. Leave this as default unless you know what you're doing!
+    :param generator_model: Accepts a `tf.keras.Model <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_ instance for a custom generator model. Leaving unspecified will use the model defined in brooksrfigan.generator.
+    :param discriminator_model: Same as *generator_model*, but for a discriminator. Leaving unspecified will use the model defined in brooksrfigan.discriminator.
+    :param tblogdir: A string indicating the filepath to store tensorboard information. Defaults to the current working directory.
+    :param enable_tensorboard: A toggle option for tensorboard logging.
+    :returns: trained generator model, trained discriminator model
+    """
     if generator_model != None and isinstance(generator_model, tf.keras.Model):
         generator = generator_model
     else:

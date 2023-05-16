@@ -1,19 +1,16 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>BrooksRFIGAN Documentation &#8212; brooksrfigan 0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Usage" href="usage.html" />
@@ -36,15 +33,39 @@
   <section id="brooksrfigan-documentation">
 <h1>BrooksRFIGAN Documentation<a class="headerlink" href="#brooksrfigan-documentation" title="Permalink to this heading">¶</a></h1>
 <p>This library is designed to make the job of training a Generative Adversarial Network for flagging Radio Frequency Interference <strong>easy</strong>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Despite my best efforts, it’s still not easy.</p>
-</div>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usage.html#minimum-usage">Minimum Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="worked_example.html">Worked Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="worked_example.html#acessing-the-ms">Acessing the MS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="full_specification.html">Full Specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="full_specification.html#preprocessing-module">Preprocessing Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.MSHandler"><code class="docutils literal notranslate"><span class="pre">MSHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.MSHandler.done"><code class="docutils literal notranslate"><span class="pre">MSHandler.done()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.MSHandler.getBaselineImages"><code class="docutils literal notranslate"><span class="pre">MSHandler.getBaselineImages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.MSHandler.getBaselineMasks"><code class="docutils literal notranslate"><span class="pre">MSHandler.getBaselineMasks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.MSHandler.getPrisonBars"><code class="docutils literal notranslate"><span class="pre">MSHandler.getPrisonBars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.MSHandler.getScans"><code class="docutils literal notranslate"><span class="pre">MSHandler.getScans()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.MSHandler.open"><code class="docutils literal notranslate"><span class="pre">MSHandler.open()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.remove_surfs"><code class="docutils literal notranslate"><span class="pre">remove_surfs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.winsorize_images"><code class="docutils literal notranslate"><span class="pre">winsorize_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.clip_images"><code class="docutils literal notranslate"><span class="pre">clip_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.pad_for_cutouts"><code class="docutils literal notranslate"><span class="pre">pad_for_cutouts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="full_specification.html#brooksrfigan.preprocessing.make_cutouts"><code class="docutils literal notranslate"><span class="pre">make_cutouts()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="full_specification.html#training-module">Training Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="full_specification.html#brooksrfigan.training.train"><code class="docutils literal notranslate"><span class="pre">train()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -70,6 +91,8 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worked_example.html">Worked Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="full_specification.html">Full Specification</a></li>
 </ul>
 
 <div class="relations">
@@ -106,8 +129,8 @@
       &copy;2023, Jacob Brooks.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |
       <a href="_sources/index.rst.txt"

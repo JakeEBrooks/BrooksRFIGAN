@@ -8,8 +8,7 @@ BrooksRFIGAN Documentation
 
 This library is designed to make the job of training a Generative Adversarial Network for flagging Radio Frequency Interference **easy**.
 
-.. note::
-   Despite my best efforts, it's still not easy.
-
 .. toctree::
    usage
+   worked_example
+   full_specification

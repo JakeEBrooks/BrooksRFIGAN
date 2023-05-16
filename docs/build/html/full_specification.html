@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Full Specification &#8212; brooksrfigan 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Worked Example" href="worked_example.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="full-specification">
+<h1>Full Specification<a class="headerlink" href="#full-specification" title="Permalink to this heading">¶</a></h1>
+<section id="preprocessing-module">
+<h2>Preprocessing Module<a class="headerlink" href="#preprocessing-module" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.MSHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">brooksrfigan.preprocessing.</span></span><span class="sig-name descname"><span class="pre">MSHandler</span></span><a class="headerlink" href="#brooksrfigan.preprocessing.MSHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interfaces with a Measurement Set to provide easy access to time-frequency images</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.MSHandler.done">
+<span class="sig-name descname"><span class="pre">done</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.MSHandler.done" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the connection to the current MS. Called at the start of every open()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.MSHandler.getBaselineImages">
+<span class="sig-name descname"><span class="pre">getBaselineImages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_corr_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_imag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.MSHandler.getBaselineImages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array containing time-frequency images for the specified baselines. By default returns an array of shape (<em>images</em>, <em>timesteps</em>, <em>channels</em>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blids</strong> – A 2d array of antenna id pairs. Use the antidpairs attribute for easy access to all baselines.
+Example input: [[0,1],[2,4]] for the baselines (antenna 0, antenna 1), and (antenna 2, antenna 4)</p></li>
+<li><p><strong>fields</strong> – A list of strings identifying fields to be included in the output. The time axis of the output is organised as it appears in the MS. See the CASA <a class="reference external" href="https://casadocs.readthedocs.io/en/stable/api/tt/casatools.ms.html#casatools.ms.ms.timesort">ms.timesort</a> 
+method for arranging in time.</p></li>
+<li><p><strong>preserve_corr_ax</strong> – An option to return the requested data with the polarisation axis preserved.</p></li>
+<li><p><strong>preserve_imag</strong> – An option to retain the complex phase information for each visibility.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numpy.ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.MSHandler.getBaselineMasks">
+<span class="sig-name descname"><span class="pre">getBaselineMasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_corr_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.MSHandler.getBaselineMasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a boolean array containing the flags for the requested visibilities. A value of <em>True</em> indicates the visibility is flagged. Typically used in conjuction with getBaselineImages(). Inputs are the same as for getBaselineImages().</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.MSHandler.getPrisonBars">
+<span class="sig-name descname"><span class="pre">getPrisonBars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quack_cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">major_chan_rowflags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minor_chan_rowflags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.MSHandler.getPrisonBars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns two <em>numpy.ndarray</em> containing the rows/columns (channels/timesteps) that are persistently flagged in every image. This allows easy removal of redundant information from the images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quack_cols</strong> – An integer specifying the number of timesteps that are flagged at the start of each scan.</p></li>
+<li><p><strong>major_chan_rowflags</strong> – An integer specifying the number of channels that are flagged at the edges of the total bandwidth.</p></li>
+<li><p><strong>minor_chan_rowflags</strong> – An integer specifying the number of channels that are flagged at the edges of each spectral window.</p></li>
+<li><p><strong>fields</strong> – Same as getBaselineImages()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numpy.ndarray</em>, <em>numpy.ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.MSHandler.getScans">
+<span class="sig-name descname"><span class="pre">getScans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.MSHandler.getScans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array indicating the scan each timestep belongs to. Called from getPrisonBars()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.MSHandler.open">
+<span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MSpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.MSHandler.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attach the MSHandler tool to a particular Measurement Set. Closes any previous connection to an MS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>MSpath</strong> – The filepath to the MS directory. For example: “path/to/myMS.ms”</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.remove_surfs">
+<span class="sig-prename descclassname"><span class="pre">brooksrfigan.preprocessing.</span></span><span class="sig-name descname"><span class="pre">remove_surfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig_levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[17,</span> <span class="pre">11,</span> <span class="pre">5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_sig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.remove_surfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a gaussian blur operation to remove the low-level signal from a time-frequency image. The process is iterative to get the best fit. It performs <em>len(sig_levels)</em> iterations and
+clips values that deviate from the mean of the residuals (image - surface) by the current iterations’ sigma level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>im_data</strong> – Input images of shape (num_images, timesteps, channels)</p></li>
+<li><p><strong>sig_levels</strong> – <p>The sigma level outside of which will be clipped in that iteration. Also indicates the number of iterations to perform.</p>
+<p>Example: sig_levels=[9,7,5] will fit a surface after 3 iterations. After the first residuals are calculated, values exceeding 9*numpy.std(residual) are clipped from the residuals.
+After the second iteration, the threshold is 7*numpy.std(residual), and so on.</p>
+</p></li>
+<li><p><strong>kernel_radius</strong> – The radius of gaussian kernel to use. As per <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter.html">gaussian_filter</a>
+the total size of the kernel will be 2*kernel_radius + 1</p></li>
+<li><p><strong>kernel_sig</strong> – The spread of the gaussian kernel. Following section 3.1 of <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2010MNRAS.405..155O/abstract">Offringa et al. 2010</a> a choice of kernel_sig=kernel_radius
+is a good starting point.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.abs(image) - surface</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.winsorize_images">
+<span class="sig-prename descclassname"><span class="pre">brooksrfigan.preprocessing.</span></span><span class="sig-name descname"><span class="pre">winsorize_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.winsorize_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns copies of the input <em>images</em> winsorized using <em>limits</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> – Input images of shape (num_images, timesteps, channels)</p></li>
+<li><p><strong>limits</strong> – <p>A tuple of two values indicating the lower and higher thresholds for winsorization.</p>
+<p>Example: Passing (0.05,0.1) to limits would set the lowest 5% of values to the 5th percentile, and the top 10% of values to the 90th percentile</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Winsorized <em>images</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.clip_images">
+<span class="sig-prename descclassname"><span class="pre">brooksrfigan.preprocessing.</span></span><span class="sig-name descname"><span class="pre">clip_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.clip_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of <em>images</em> with values deviating from the mean by <em>sigma*numpy.std(image)</em> clipped</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.pad_for_cutouts">
+<span class="sig-prename descclassname"><span class="pre">brooksrfigan.preprocessing.</span></span><span class="sig-name descname"><span class="pre">pad_for_cutouts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">1024)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">padkwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.pad_for_cutouts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pads the input images to ensure that an integer number of cutouts of <em>cutout_size</em> can be made. Extra keyword arguments are passed to <em>numpy.pad</em></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="brooksrfigan.preprocessing.make_cutouts">
+<span class="sig-prename descclassname"><span class="pre">brooksrfigan.preprocessing.</span></span><span class="sig-name descname"><span class="pre">make_cutouts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(128,</span> <span class="pre">1024)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.preprocessing.make_cutouts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all the data contained in images among cutouts of size <em>cutout_size</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>numpy.ndarray</em> of shape (N, cutout_size[0], cutout_size[1])</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="training-module">
+<h2>Training Module<a class="headerlink" href="#training-module" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="brooksrfigan.training.train">
+<span class="sig-prename descclassname"><span class="pre">brooksrfigan.training.</span></span><span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_multi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_loss_lambda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discriminator_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tblogdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./tensorboard_log/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_tensorboard</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#brooksrfigan.training.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>The primary function of this package. Interfaces with Tensorflow to produce a trained generator model and discriminator model. The trained generator model can be used generate accurate flag masks that
+retain the characteristics of those found in the training set. By default, the function will train a generator and a discriminator using the basic models found in brooksrfigan.generator and brooksrfigan.dsicriminator,
+though an option exists to specify a different Keras model. Details of the training process can be logged to tensorboard through the <em>enable_tensorboard</em> parameter, and the location of the stored information is 
+controlled by passing a filepath to <em>tblogdir</em>. Also outputs useful information to the python logger during training.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – A two component <a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/data/Dataset">tf.data.Dataset</a> instance containing the image and ground truth mask cutouts. Normally created by something like:
+<code class="code highlight python docutils literal highlight-python"><span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_tensor_slices</span><span class="p">((</span><span class="n">images</span><span class="p">,</span><span class="n">masks</span><span class="p">))</span></code> where <em>images</em> and <em>masks</em> are numpy arrays created by preprocessing.make_cutouts, for example.</p></li>
+<li><p><strong>epochs</strong> – An integer specifying the number of loops to perform over the full training set. A validation run is performed at the end of each epoch.</p></li>
+<li><p><strong>batch_size</strong> – How many images to process in each training step. The choice of batch_size is pretty much down to how much memory you have on your system. Higher RAM capacity systems can process more batches at once.</p></li>
+<li><p><strong>validation_multi</strong> – How many multiples of <em>batch_size</em> to set aside as a validation set. For example, with a batch size of 16, setting <em>validation_multi = 4</em> would keep aside 64 images for validation at
+the end of each epoch</p></li>
+<li><p><strong>gen_loss_lambda</strong> – An integer specifying the weight associated with the mean absolute error in the generator loss. Leave this as default unless you know what you’re doing!</p></li>
+<li><p><strong>generator_model</strong> – Accepts a <a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/keras/Model">tf.keras.Model</a> instance for a custom generator model. Leaving unspecified will use the model defined in brooksrfigan.generator.</p></li>
+<li><p><strong>discriminator_model</strong> – Same as <em>generator_model</em>, but for a discriminator. Leaving unspecified will use the model defined in brooksrfigan.discriminator.</p></li>
+<li><p><strong>tblogdir</strong> – A string indicating the filepath to store tensorboard information. Defaults to the current working directory.</p></li>
+<li><p><strong>enable_tensorboard</strong> – A toggle option for tensorboard logging.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>trained generator model, trained discriminator model</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">brooksrfigan</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worked_example.html">Worked Example</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Full Specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#preprocessing-module">Preprocessing Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#brooksrfigan.preprocessing.MSHandler"><code class="docutils literal notranslate"><span class="pre">MSHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#brooksrfigan.preprocessing.MSHandler.done"><code class="docutils literal notranslate"><span class="pre">MSHandler.done()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#brooksrfigan.preprocessing.MSHandler.getBaselineImages"><code class="docutils literal notranslate"><span class="pre">MSHandler.getBaselineImages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#brooksrfigan.preprocessing.MSHandler.getBaselineMasks"><code class="docutils literal notranslate"><span class="pre">MSHandler.getBaselineMasks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#brooksrfigan.preprocessing.MSHandler.getPrisonBars"><code class="docutils literal notranslate"><span class="pre">MSHandler.getPrisonBars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#brooksrfigan.preprocessing.MSHandler.getScans"><code class="docutils literal notranslate"><span class="pre">MSHandler.getScans()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#brooksrfigan.preprocessing.MSHandler.open"><code class="docutils literal notranslate"><span class="pre">MSHandler.open()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#brooksrfigan.preprocessing.remove_surfs"><code class="docutils literal notranslate"><span class="pre">remove_surfs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#brooksrfigan.preprocessing.winsorize_images"><code class="docutils literal notranslate"><span class="pre">winsorize_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#brooksrfigan.preprocessing.clip_images"><code class="docutils literal notranslate"><span class="pre">clip_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#brooksrfigan.preprocessing.pad_for_cutouts"><code class="docutils literal notranslate"><span class="pre">pad_for_cutouts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#brooksrfigan.preprocessing.make_cutouts"><code class="docutils literal notranslate"><span class="pre">make_cutouts()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#training-module">Training Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#brooksrfigan.training.train"><code class="docutils literal notranslate"><span class="pre">train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="worked_example.html" title="previous chapter">Worked Example</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Jacob Brooks.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/full_specification.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
